@@ -1,23 +1,31 @@
- on:
-    push:
-        branches:
-        - main
-        tags:
-        - "v*"
-    pull_request:
-      branches:
-       - main
-    workflow_dispatch:
-       - name: Extract metadata for Docker
-         id: meta
-         uses: docker/metadata-action@v5
-         with:
-        images: ghcr.io/chintan012388/skills-publish-docker-images/stackoverflown
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch: {}
 
-       - name: Build and push Docker image
-         uses: docker/build-push-action@v5
-         with:
-         context: .
-         push: true
-         platforms: linux/amd64,linux/arm64
-         tags: ${{ steps.meta.outputs.tags }}
+jobs:
+  build-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/chintan012388/skills-publish-docker-images/stackoverflown
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.meta.outputs.tags }}}
